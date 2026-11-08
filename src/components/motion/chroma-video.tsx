@@ -247,34 +247,64 @@ export function ChromaVideo({
     };
 
     /*
-     * requestVideoFrameCallback fires once per decoded video frame — 24 here,
-     * against a 60Hz display — so it does two thirds less work than a render
-     * loop and never tears. Where it is missing, fall back to GSAP's ticker
-     * rather than opening a second rAF loop (see AGENTS.md).
+     * Frames are pumped by GSAP's ticker until requestVideoFrameCallback proves
+     * it works, then by that alone. rVFC fires once per decoded frame (24 here
+     * against a 60Hz display), so it is the cheaper of the two, but iOS Safari
+     * has it and does not always fire it for a video it is not presenting.
+     * Starting on the ticker means the model appears either way; there is
+     * still only the one rAF loop (see AGENTS.md).
      */
     let handle = 0;
-    let usingFrameCallback = false;
+    let onTicker = true;
+    gsap.ticker.add(draw);
 
     if (typeof video.requestVideoFrameCallback === "function") {
-      usingFrameCallback = true;
       const onFrame = () => {
+        if (onTicker) {
+          gsap.ticker.remove(draw);
+          onTicker = false;
+        }
         draw();
         handle = video.requestVideoFrameCallback!(onFrame);
       };
       handle = video.requestVideoFrameCallback(onFrame);
-    } else {
-      gsap.ticker.add(draw);
     }
 
-    const play = () => void video.play().catch(() => {});
-    if (video.readyState >= 2) play();
-    else video.addEventListener("loadeddata", play, { once: true });
+    /*
+     * iOS will not autoplay unless the element is muted as an attribute, not
+     * only as a property, and React renders `muted` as a property alone. It
+     * also ignores `preload`, so waiting for `loadeddata` before calling
+     * play() waits forever: nothing loads until play() is called. So: mute
+     * it every way there is, and ask to play straight away.
+     */
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+
+    const play = () => {
+      if (!video.paused) return;
+      video.play().catch(() => {
+        // Refused, usually Low Power Mode. The first touch or scroll counts
+        // as permission, so try again then.
+      });
+    };
+
+    play();
+    video.addEventListener("loadeddata", play);
+    video.addEventListener("canplay", play);
+    const gestures = ["touchstart", "pointerdown", "scroll"] as const;
+    for (const type of gestures) {
+      window.addEventListener(type, play, { passive: true });
+    }
 
     return () => {
-      if (usingFrameCallback) video.cancelVideoFrameCallback?.(handle);
-      else gsap.ticker.remove(draw);
+      if (onTicker) gsap.ticker.remove(draw);
+      video.cancelVideoFrameCallback?.(handle);
 
       video.removeEventListener("loadeddata", play);
+      video.removeEventListener("canplay", play);
+      for (const type of gestures) window.removeEventListener(type, play);
       gl.deleteTexture(texture);
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
@@ -293,9 +323,12 @@ export function ChromaVideo({
         preload="auto"
         poster={poster}
         aria-hidden
-        // The source element stays in the DOM as the pixel source for the
-        // shader, but is never shown — it still has its green background.
-        className="pointer-events-none absolute h-px w-px opacity-0"
+        // The pixel source for the shader, still on its green screen, so it
+        // must not be seen. It is laid over the full box at 1% opacity rather
+        // than shrunk to a pixel: iOS pauses muted video it judges invisible,
+        // and a 1px box at opacity 0 is exactly that. At 1% the green adds a
+        // couple of levels to the scene behind it, which no eye can see.
+        className="pointer-events-none absolute inset-0 h-full w-full object-contain opacity-[0.01]"
       >
         {sources.map((source) => (
           <source key={source.src} src={source.src} type={source.type} />

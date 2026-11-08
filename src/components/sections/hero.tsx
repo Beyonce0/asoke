@@ -173,7 +173,10 @@ export function Hero({ media }: { media?: HeroMedia }) {
     <section
       ref={scope}
       // Cancels the sticky header's space in flow so this really is one screen.
-      className="relative mt-[calc(var(--header-height)*-1)] h-dvh w-full overflow-hidden"
+      // A floor, not a fixed height: on a short window (a laptop at 150%
+      // scaling, with a browser banner open) the copy is taller than the
+      // screen, and a fixed height pushed it up under the menu.
+      className="relative mt-[calc(var(--header-height)*-1)] min-h-dvh w-full overflow-hidden"
     >
       <div data-hero-scene className="absolute inset-0">
         <Image
@@ -263,16 +266,17 @@ export function Hero({ media }: { media?: HeroMedia }) {
 
         <ChromaVideo
           /*
-            WebM first: where a browser supports it the file is smaller, and
-            where it does not the MP4 below is picked up instead. Both are
-            green-screen source for the shader either way.
+            MP4 first. Every iPhone plays H.264, while WebM there depends on
+            the iOS version and the codec, and a WebM that loads but will not
+            decode leaves the model missing on phones. The WebM is kept as the
+            fallback for anything without H.264.
           */
           sources={[
+            { src: media?.videoMp4 || SHIPPED.videoMp4, type: "video/mp4" },
             {
               src: media?.videoWebm || SHIPPED.videoWebm,
               type: "video/webm",
             },
-            { src: media?.videoMp4 || SHIPPED.videoMp4, type: "video/mp4" },
           ]}
           width={MODEL.width}
           height={MODEL.height}
@@ -283,8 +287,28 @@ export function Hero({ media }: { media?: HeroMedia }) {
         />
       </div>
 
-      <Container className="relative z-10 flex h-full flex-col justify-center">
-        <div className="max-w-[19rem] sm:max-w-md md:max-w-xl">
+      {/*
+        Centred in the space under the menu, not the whole screen, so the
+        copy can never ride up behind it. The bottom padding keeps it clear of
+        the scroll cue.
+      */}
+      {/*
+        Phones only. There the model stands behind the copy rather than beside
+        it, so a scrim under the photograph is not enough: this one sits over
+        her, darkest where the words are and gone by her face, so the
+        paragraph reads without hiding her.
+      */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 md:hidden"
+        style={{
+          background:
+            "linear-gradient(100deg, rgba(13,12,12,0.78) 0%, rgba(13,12,12,0.6) 38%, rgba(13,12,12,0.15) 62%, transparent 75%)",
+        }}
+      />
+
+      <Container className="relative z-10 flex min-h-dvh flex-col justify-center pt-[calc(var(--header-height)+1.5rem)] pb-28 [@media(max-height:700px)]:pb-10">
+        <div className="max-w-[19rem] sm:max-w-md md:max-w-xl lg:max-w-2xl">
           <p
             data-hero-fade
             className="text-gold text-[0.65rem] tracking-[0.32em] uppercase"
@@ -299,7 +323,9 @@ export function Hero({ media }: { media?: HeroMedia }) {
           */}
           <h1
             ref={headingRef}
-            className="text-cream mt-6 text-[clamp(2.5rem,6.5vw,5.5rem)] font-normal opacity-0"
+            // Sized by the shorter of width and height. Width alone made it
+            // 88px on a wide, short laptop window, three lines tall.
+            className="text-cream mt-6 text-[clamp(2.25rem,min(5.6vw,10.5vh),4.75rem)] leading-[1.05] font-normal opacity-0 [@media(max-height:700px)]:mt-4"
           >
             {t.home.hero.titleLead}{" "}
             <em className="text-cream/95 italic">{t.home.hero.titleTail}</em>
@@ -307,18 +333,21 @@ export function Hero({ media }: { media?: HeroMedia }) {
 
           <div
             data-hero-rule
-            className="bg-gold/40 mt-9 h-px w-full origin-left"
+            className="bg-gold/40 mt-9 h-px w-full origin-left [@media(max-height:700px)]:mt-5"
             aria-hidden
           />
 
           <p
             data-hero-fade
-            className="text-cream-soft mt-8 max-w-md text-base leading-relaxed"
+            className="text-cream-soft mt-8 max-w-md text-base leading-relaxed [@media(max-height:700px)]:mt-5 [@media(max-height:700px)]:text-sm"
           >
             {t.home.hero.body}
           </p>
 
-          <div data-hero-fade className="mt-10 flex flex-wrap gap-3">
+          <div
+            data-hero-fade
+            className="mt-10 flex flex-wrap gap-3 [@media(max-height:700px)]:mt-6"
+          >
             {/* Gold fill with a dark label — 7.3:1, where cream would be 2.2. */}
             <ButtonLink href="/shop" variant="gold" size="lg" className="group">
               {t.home.hero.explore}
@@ -344,7 +373,8 @@ export function Hero({ media }: { media?: HeroMedia }) {
         It is a real button, not decoration: pressing it hands the scroll to
         Lenis, so clicking gets the same eased travel as dragging does.
       */}
-      <div className="absolute inset-x-0 bottom-7 z-20 flex justify-center md:bottom-9">
+      {/* Dropped on very short windows, where it would sit on the buttons. */}
+      <div className="absolute inset-x-0 bottom-7 z-20 flex justify-center md:bottom-9 [@media(max-height:600px)]:hidden max-md:[@media(max-height:760px)]:hidden">
         <button
           type="button"
           data-hero-fade
