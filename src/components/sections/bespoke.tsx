@@ -91,7 +91,7 @@ export async function Bespoke() {
 
         <Reveal delay={0.1}>
           <ButtonLink
-            href="/contact"
+            href="/contact#enquire"
             variant="gold"
             size="lg"
             className="mt-16"

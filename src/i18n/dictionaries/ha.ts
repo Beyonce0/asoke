@@ -333,6 +333,7 @@ export const ha: Dictionary = {
     thanksTitle: "An aika saƙonki",
     thanksBody:
       "Na gode, {name}. Za mu amsa zuwa {email} cikin kwana ɗaya na aiki.",
+    privacyNote: "Muna amfani da bayananki ne kawai don amsa tambayarki.",
     errors: {
       name: "Faɗa mana sunanki.",
       email: "Shigar da ingantaccen adireshin imel.",
@@ -340,7 +341,7 @@ export const ha: Dictionary = {
       notConnected:
         "Ba a haɗa saƙonni ba tukuna. Saka maɓallan Supabase ɗinka a .env.local don karɓar su.",
       failed:
-        "Ba mu iya aika saƙonki ba. Don Allah ki sake gwadawa nan ba da jimawa ba.",
+        "Yi haƙuri, saƙonki bai tafi ba. Don Allah ki aiko imel zuwa {email}.",
     },
   },
 

@@ -336,14 +336,14 @@ export const ig: Dictionary = {
     sending: "A na-eziga ya…",
     thanksTitle: "E zigala ozi gị",
     thanksBody: "Daalụ, {name}. Anyị ga-aza {email} n'ime otu ụbọchị ọrụ.",
+    privacyNote: "Anyị na-eji nkọwa gị naanị iji zaa ajụjụ gị.",
     errors: {
       name: "Gwa anyị aha gị.",
       email: "Tinye adreesị email ziri ezi.",
       message: "Dee ozi nwere opekata mpe mkpụrụedemede iri.",
       notConnected:
         "Edebeghị njikọ ozi. Tinye igodo Supabase gị na .env.local ka i nwee ike ịnata ha.",
-      failed:
-        "Anyị enweghị ike iziga ozi gị. Biko nwaa ọzọ n'oge na-adịghị anya.",
+      failed: "Ndo, ozi gị agaghị. Biko zitere anyị email na {email}.",
     },
   },
 

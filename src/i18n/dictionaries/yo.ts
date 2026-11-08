@@ -329,13 +329,14 @@ export const yo: Dictionary = {
     sending: "À ń fi ránṣẹ́…",
     thanksTitle: "A ti gba ọ̀rọ̀ rẹ",
     thanksBody: "A dúpẹ́, {name}. A ó dáhùn sí {email} láàrin ọjọ́ iṣẹ́ kan.",
+    privacyNote: "A ó lo àlàyé rẹ fún dídáhùn ìbéèrè rẹ nìkan.",
     errors: {
       name: "Sọ orúkọ rẹ fún wa.",
       email: "Kọ àdírẹ́sì ímeèlì tó tọ́.",
       message: "Kọ ọ̀rọ̀ tí ó kéré tán ní lẹ́tà mẹ́wàá.",
       notConnected:
         "Ọ̀rọ̀ kò tíì so pọ̀. Fi àwọn kọ́kọ́rọ́ Supabase rẹ sínú .env.local láti gbà wọ́n.",
-      failed: "A kò lè fi ọ̀rọ̀ rẹ ránṣẹ́. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí i láìpẹ́.",
+      failed: "Ẹ má bínú, ọ̀rọ̀ rẹ kò lọ. Jọ̀wọ́ kọ ímeèlì sí {email}.",
     },
   },
 

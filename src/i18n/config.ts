@@ -10,12 +10,14 @@
  */
 
 export const LOCALES = [
-  { code: "en", name: "English", intl: "en-NG" },
-  { code: "yo", name: "Yorùbá", intl: "yo-NG" },
-  { code: "ig", name: "Igbo", intl: "ig-NG" },
-  { code: "ha", name: "Hausa", intl: "ha-NG" },
+  // `name` is how the picker shows it, in its own words. `english` is what
+  // the enquiry automation is told, so its AI knows which language to answer in.
+  { code: "en", name: "English", english: "English", intl: "en-NG" },
+  { code: "yo", name: "Yorùbá", english: "Yorùbá", intl: "yo-NG" },
+  { code: "ig", name: "Igbo", english: "Igbo", intl: "ig-NG" },
+  { code: "ha", name: "Hausa", english: "Hausa", intl: "ha-NG" },
   // ISO 639-3 has a code for Nigerian Pidgin, and CLDR formats dates in it.
-  { code: "pcm", name: "Pidgin", intl: "pcm-NG" },
+  { code: "pcm", name: "Pidgin", english: "Nigerian Pidgin", intl: "pcm-NG" },
 ] as const;
 
 export type Locale = (typeof LOCALES)[number]["code"];
@@ -31,6 +33,11 @@ export function isLocale(value: unknown): value is Locale {
 /** The BCP 47 tag for `<html lang>` and for formatting dates. */
 export function intlTag(locale: Locale) {
   return LOCALES.find((entry) => entry.code === locale)?.intl ?? "en-NG";
+}
+
+/** The language's English name: "Yorùbá", "Nigerian Pidgin". */
+export function englishName(locale: Locale) {
+  return LOCALES.find((entry) => entry.code === locale)?.english ?? "English";
 }
 
 /** "Only {count} left" → "Only 2 left". Unknown names are left as written. */

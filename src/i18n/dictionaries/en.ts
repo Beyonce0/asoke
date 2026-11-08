@@ -327,13 +327,14 @@ export const en = {
     thanksTitle: "Message sent",
     thanksBody:
       "Thank you, {name}. We will reply to {email} within one working day.",
+    privacyNote: "We use your details only to reply to your enquiry.",
     errors: {
       name: "Tell us your name.",
       email: "Enter a valid email address.",
       message: "Write a message of at least 10 characters.",
       notConnected:
         "Messages are not connected yet. Add your Supabase keys to .env.local to receive them.",
-      failed: "We could not send your message. Please try again in a moment.",
+      failed: "Sorry, your message didn't go through. Please email {email}.",
     },
   },
 

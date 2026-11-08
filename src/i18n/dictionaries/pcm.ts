@@ -324,13 +324,14 @@ export const pcm: Dictionary = {
     thanksTitle: "Message don go",
     thanksBody:
       "Thank you, {name}. We go reply {email} inside one working day.",
+    privacyNote: "We go use your details only to answer your question.",
     errors: {
       name: "Tell us your name.",
       email: "Put correct email address.",
       message: "Write message wey reach at least 10 letters.",
       notConnected:
         "Messages never connect. Put your Supabase keys for .env.local make e fit receive dem.",
-      failed: "We no fit send your message. Abeg try again small time.",
+      failed: "Sorry, your message no go. Abeg send email to {email}.",
     },
   },
 

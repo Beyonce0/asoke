@@ -114,6 +114,14 @@ export function EnquiryForm() {
       )}
 
       <SubmitButton />
+
+      {/*
+        Plain text for now. It will link to /privacy once that page is
+        approved and published; until then there is nothing to link to.
+      */}
+      <p className="text-muted text-center text-xs leading-relaxed">
+        {t.privacyNote}
+      </p>
     </form>
   );
 }

@@ -13,6 +13,11 @@ const label = "text-muted block text-[0.6rem] tracking-[0.24em] uppercase";
 /*
  * Write back without leaving the dashboard. The customer's message is quoted
  * under the reply automatically, so this box is only for the answer itself.
+ *
+ * This is the second route, for follow-ups and for anything the AI cannot
+ * handle. The first reply to every enquiry goes out through the Make
+ * automation's approval email, so the note below sends the owner to the
+ * Enquiry Log sheet before writing, to avoid answering a customer twice.
  */
 export function EnquiryReply({
   id,
@@ -56,6 +61,12 @@ export function EnquiryReply({
       <p className={label}>Reply by email</p>
       <p className="text-cream-soft mt-2 text-sm">
         To <span className="text-cream">{to}</span>
+      </p>
+
+      <p className="border-gold/30 bg-gold/10 text-cream-soft mt-4 rounded-md border px-4 py-3 text-xs leading-relaxed">
+        The first reply goes out through the AI approval email. Check the
+        Enquiry Log sheet first: if Status is Sent, this customer already has a
+        reply.
       </p>
 
       <div className="mt-5 space-y-4">

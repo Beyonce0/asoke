@@ -1,12 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 
-import { fill } from "@/i18n/config";
+import { englishName, fill } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { getDictionary } from "@/i18n/server";
+import { getDictionary, getLocale } from "@/i18n/server";
 import { isConfigured } from "@/lib/env";
+import { getSiteSettings } from "@/lib/queries";
+import { sendEnquiryToMake } from "@/lib/send-enquiry-to-make";
 import { createClient } from "@/lib/supabase/server";
 
 export type EnquiryState = { error?: string; sent?: string };
@@ -23,7 +26,14 @@ function enquirySchema(errors: Dictionary["enquiry"]["errors"]) {
 }
 
 /*
- * A message to the atelier, landing in the dashboard's Inbox as `new`.
+ * A message to the atelier. Two destinations, in this order:
+ *
+ *   1. The database, so it lands in admin → Enquiries as `new`. This is the
+ *      record, and the only step whose failure the visitor is told about.
+ *   2. Make, which drafts the first reply for the owner to approve. Sent in
+ *      `after()`, once the visitor already has their thank-you, so a slow or
+ *      unreachable webhook never keeps them waiting or fails their message.
+ *      A failure there is logged; the enquiry is still in the inbox.
  *
  * Written with the visitor's own client: the "anyone may write to the
  * atelier" policy allows the insert and nothing else, so a signed-out visitor
@@ -34,7 +44,10 @@ export async function sendEnquiry(
   _previous: EnquiryState,
   formData: FormData,
 ): Promise<EnquiryState> {
-  const t = (await getDictionary()).enquiry;
+  const [locale, { enquiry: t }] = await Promise.all([
+    getLocale(),
+    getDictionary(),
+  ]);
 
   // A field no person sees. Anything that fills it in is a script; it gets a
   // thank-you as a person would, and nothing is written.
@@ -74,13 +87,37 @@ export async function sendEnquiry(
     message,
   });
 
+  // The one failure the visitor hears about: nothing was saved, so they are
+  // pointed at email instead. The address follows Settings when it is set.
   if (error) {
     console.error("[contact:sendEnquiry]", error.code, error.message);
-    return { error: t.errors.failed };
+    const settings = await getSiteSettings();
+    return {
+      error: fill(t.errors.failed, {
+        email: settings.email || "hello@asoke.ng",
+      }),
+    };
   }
 
   revalidatePath("/admin/inbox");
   revalidatePath("/admin");
+
+  after(async () => {
+    const forwarded = await sendEnquiryToMake({
+      fullName,
+      email,
+      phone,
+      subject,
+      message,
+      language: englishName(locale),
+    });
+
+    if (!forwarded) {
+      console.error(
+        `[contact:sendEnquiry] saved but NOT forwarded to Make: ${email}. Reply from admin → Enquiries.`,
+      );
+    }
+  });
 
   return {
     sent: fill(t.thanksBody, { name: fullName.split(" ")[0], email }),

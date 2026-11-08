@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CalendarDays } from "lucide-react";
 
+import { EnquiryForm } from "@/components/shop/enquiry-form";
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { getDictionary } from "@/i18n/server";
@@ -25,7 +26,8 @@ const CHANNELS = [
 ] as const;
 
 export default async function ContactPage() {
-  const t = (await getDictionary()).contact;
+  const dictionary = await getDictionary();
+  const t = dictionary.contact;
 
   return (
     <Container className="py-16 md:py-28">
@@ -52,33 +54,47 @@ export default async function ContactPage() {
               </div>
             ))}
           </dl>
+
+          <div className="bg-surface mt-14 p-8 sm:p-10">
+            <h2 className="font-sans text-[0.7rem] tracking-[0.24em] uppercase">
+              {t.atelier}
+            </h2>
+            <address className="text-cream-soft mt-5 text-sm leading-relaxed not-italic">
+              {t.place}
+              <br />
+              {t.byAppointment}
+            </address>
+            <ButtonLink
+              href="/book"
+              variant="gold"
+              size="lg"
+              className="group mt-8 w-full font-semibold sm:w-auto"
+            >
+              <CalendarDays
+                className="size-4 transition-transform duration-300 group-hover:-rotate-6"
+                strokeWidth={1.75}
+                aria-hidden
+              />
+              {t.book}
+            </ButtonLink>
+            <p className="text-muted mt-8 text-xs leading-relaxed">
+              {t.shipping}
+            </p>
+          </div>
         </div>
 
-        <div className="bg-surface h-fit p-10">
-          <h2 className="font-sans text-[0.7rem] tracking-[0.24em] uppercase">
-            {t.atelier}
+        {/*
+          The same form and the same action as the homepage section, so a
+          message sent from either lands in the same inbox and the same Make
+          scenario. "Begin a commission" links here, to #enquire.
+        */}
+        <div id="enquire" className="scroll-mt-28">
+          <h2 className="text-2xl md:text-3xl">
+            {dictionary.home.reach.title}
           </h2>
-          <address className="text-cream-soft mt-5 text-sm leading-relaxed not-italic">
-            {t.place}
-            <br />
-            {t.byAppointment}
-          </address>
-          <ButtonLink
-            href="/book"
-            variant="gold"
-            size="lg"
-            className="group mt-8 w-full font-semibold sm:w-auto"
-          >
-            <CalendarDays
-              className="size-4 transition-transform duration-300 group-hover:-rotate-6"
-              strokeWidth={1.75}
-              aria-hidden
-            />
-            {t.book}
-          </ButtonLink>
-          <p className="text-muted mt-8 text-xs leading-relaxed">
-            {t.shipping}
-          </p>
+          <div className="bg-surface border-gold/15 mt-6 border p-7 sm:p-10">
+            <EnquiryForm />
+          </div>
         </div>
       </div>
     </Container>
