@@ -74,7 +74,11 @@ void main() {
     frame.b
   );
 
-  gl_FragColor = vec4(colour, alpha);
+  // Premultiplied: colour scaled by its own alpha, so a keyed-out pixel is
+  // (0,0,0,0) and not "invisible but still blue". iOS composites a
+  // straight-alpha canvas as if it were premultiplied, and the leftover
+  // colour in the transparent screen area showed as a tinted box.
+  gl_FragColor = vec4(colour * alpha, alpha);
 }
 `;
 
@@ -153,10 +157,11 @@ export function ChromaVideo({
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
 
-    // premultipliedAlpha:false — the shader emits straight alpha, and letting
-    // the browser assume otherwise puts a dark fringe around the subject.
+    // premultipliedAlpha:true, matching the shader, which multiplies colour by
+    // alpha itself. Every browser composites that the same way; a straight-
+    // alpha canvas is where iOS and Chrome disagree.
     const gl = canvas.getContext("webgl", {
-      premultipliedAlpha: false,
+      premultipliedAlpha: true,
       alpha: true,
       antialias: false,
     });

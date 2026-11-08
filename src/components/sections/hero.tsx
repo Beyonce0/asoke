@@ -205,7 +205,7 @@ export function Hero({ media }: { media?: HeroMedia }) {
         className="absolute inset-0 md:hidden"
         style={{
           background:
-            "linear-gradient(100deg, rgba(13,12,12,0.95) 0%, rgba(13,12,12,0.86) 34%, rgba(13,12,12,0.5) 62%, rgba(13,12,12,0.2) 100%)",
+            "linear-gradient(100deg, rgba(13,12,12,0.72) 0%, rgba(13,12,12,0.55) 34%, rgba(13,12,12,0.2) 62%, transparent 85%)",
         }}
       />
       <div
@@ -292,23 +292,12 @@ export function Hero({ media }: { media?: HeroMedia }) {
         copy can never ride up behind it. The bottom padding keeps it clear of
         the scroll cue.
       */}
-      {/*
-        Phones only. There the model stands behind the copy rather than beside
-        it, so a scrim under the photograph is not enough: this one sits over
-        her, darkest where the words are and gone by her face, so the
-        paragraph reads without hiding her.
-      */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 md:hidden"
-        style={{
-          background:
-            "linear-gradient(100deg, rgba(13,12,12,0.78) 0%, rgba(13,12,12,0.6) 38%, rgba(13,12,12,0.15) 62%, transparent 75%)",
-        }}
-      />
-
       <Container className="relative z-10 flex min-h-dvh flex-col justify-center pt-[calc(var(--header-height)+1.5rem)] pb-28 [@media(max-height:700px)]:pb-10">
-        <div className="max-w-[19rem] sm:max-w-md md:max-w-xl lg:max-w-2xl">
+        {/*
+          On phones the words sit over the model and a lighter scrim, so they
+          carry their own soft shadow: legible without dimming the photograph.
+        */}
+        <div className="max-w-[19rem] max-md:[text-shadow:0_1px_14px_rgba(13,12,12,0.9),0_0_2px_rgba(13,12,12,0.6)] sm:max-w-md md:max-w-xl lg:max-w-2xl">
           <p
             data-hero-fade
             className="text-gold text-[0.65rem] tracking-[0.32em] uppercase"
@@ -346,7 +335,7 @@ export function Hero({ media }: { media?: HeroMedia }) {
 
           <div
             data-hero-fade
-            className="mt-10 flex flex-wrap gap-3 [@media(max-height:700px)]:mt-6"
+            className="mt-10 flex flex-wrap gap-3 [text-shadow:none] [@media(max-height:700px)]:mt-6"
           >
             {/* Gold fill with a dark label — 7.3:1, where cream would be 2.2. */}
             <ButtonLink href="/shop" variant="gold" size="lg" className="group">
