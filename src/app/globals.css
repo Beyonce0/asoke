@@ -1,26 +1,184 @@
 @import "tailwindcss";
 
+/*
+ * ÀṢÒKÉ — Woven For Her
+ *
+ * Locked palette. A dark house: the site sits on deep charcoal, the way the
+ * atelier photography does, and the cloth colours do the talking.
+ *
+ * The site commits to this one look — it does not invert with the OS theme,
+ * because a fashion catalogue whose colour shifts under the viewer
+ * misrepresents the fabric.
+ */
+
+@theme {
+  /* ── The house colours ───────────────────────────────────────────────── */
+  /*
+   * Named `charcoal`, not `base` — Tailwind already ships `text-base` as a
+   * font size, and a `--color-base` token silently collides with it.
+   */
+  /* Main background. Deep charcoal. */
+  --color-charcoal: #0d0c0c;
+  /* Secondary background. Warm brown-black, for sections that lift off it. */
+  --color-surface: #171312;
+  /* Primary brand colour. Deep navy — ÀṢỌKÉ blue. */
+  --color-navy: #172a4a;
+  /* Luxury accent. Muted antique gold. */
+  --color-gold: #b89b5e;
+  /* Textile accent. Deep burgundy. */
+  --color-burgundy: #7a1018;
+
+  /* ── Derived, because a dark house still needs something to read on ──── */
+  /* Primary text. Warm off-white, never pure #fff — it glares on charcoal. */
+  --color-cream: #ede6da;
+  /* Body copy. 9.3:1 on base. */
+  --color-cream-soft: #b9b1a6;
+  /* Labels, meta, captions. 5.2:1 on base — the lightest text may go. */
+  --color-muted: #8a8177;
+  /* Hairlines and borders. */
+  --color-line: #2a2422;
+  /* Hover lifts. */
+  --color-gold-light: #d0b782;
+  --color-burgundy-light: #97202a;
+  --color-navy-light: #223a63;
+
+  --color-success: #6fae84;
+  --color-danger: #d4685c;
+
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * `beside:` — the conditions under which a card may open a panel next to
+ * itself instead of stacking it underneath: room to the side, and a pointer to
+ * open it with. Width alone is not the test. A landscape tablet is 1024px wide
+ * and cannot hover, and Tailwind compiles every `group-hover` rule inside
+ * `@media (hover: hover)`, so a panel hidden on width would be revealed there
+ * by nothing at all.
+ */
+@custom-variant beside (@media (width >= 64rem) and (hover: hover) and (pointer: fine));
+
+/*
+ * Contrast on charcoal (#0D0C0C), already checked:
+ *   cream       15.6:1  → anything
+ *   cream-soft   9.3:1  → body copy
+ *   muted        5.2:1  → labels and meta
+ *   gold         7.3:1  → safe for text on this palette, unlike a light one
+ *   burgundy     1.6:1  → fills only. Cream on burgundy is 9.9:1
+ *   navy         1.3:1  → fills only. Cream on navy is 11.8:1
+ */
+
+/* Lenis — required for smooth scrolling to take over from the native scroller. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Nothing scrolls while the intro is on screen. */
+html[data-intro-active] {
+  overflow: hidden;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Header height. The showcase plate cancels it out to sit truly full-screen,
+     so the two must stay in step — hence one value, read by both. */
+  --header-height: 5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-color: var(--color-charcoal);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /*
+     * Native controls are drawn by the browser, not by this stylesheet — the
+     * popup list of a <select>, scrollbars, the date picker in the admin, the
+     * yellow wash Chrome puts behind an autofilled field. Without this they
+     * are all painted for a light page, which is how the state list on
+     * checkout ended up grey on grey and unreadable.
+     *
+     * The site commits to one dark look, so this is a statement of fact
+     * rather than a preference to be toggled.
+     */
+    color-scheme: dark;
+  }
+
+  /*
+   * And the belt to that pair of braces. Chrome and Firefox on Windows and
+   * Linux let the page colour the option list; macOS and Safari draw it
+   * themselves and ignore this, which is what `color-scheme` above covers.
+   */
+  option {
+    background-color: var(--color-surface);
+    color: var(--color-cream);
+  }
+
+  body {
+    background-color: var(--color-charcoal);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-charcoal);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+
+  /* Yoruba diacritics sit high; give headings room so they never clip. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    line-height: 1.15;
+    padding-block-start: 0.06em;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Wordmark treatment — wide tracking, small caps feel. */
+  .wordmark {
+    font-family: var(--font-display);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  /* Clips a child so it can be revealed with a translate from below. */
+  .mask-line {
+    overflow: hidden;
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -32,6 +32,12 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template must be committed, or nobody knows what to fill in.
+!.env.example
+
+# supabase cli scratch
+/supabase/.temp
+/supabase/.branches
 
 # vercel
 .vercel
